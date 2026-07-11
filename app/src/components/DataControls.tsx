@@ -202,8 +202,8 @@ export default function DataControls({ capsuleCount }: DataControlsProps) {
         className="mt-3 text-xs leading-relaxed text-white/35"
         style={{ fontFamily: "'Space Mono', monospace" }}
       >
-        Supports: LinkCapsule export format, array of objects, or objects with a `data` field.
-        Required: `title`, `url`. Optional: `color`, `pinned`, `createdAt`.
+        JSON: array or `{'{ data: [...] }'}`. Required: `title`, `url`.
+        Optional: `description`, `color`, `pinned`, `createdAt` (and PascalCase / snake_case variants).
       </p>
     </div>
   );
