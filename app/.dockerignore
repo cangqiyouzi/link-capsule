@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+*.swp
+*.log
+
+# 敏感配置：环境变量由平台注入，绝不打进镜像
+.env
+.env.*
+!.env.example
+
+# 本地构建产物与缓存
+*.tsbuildinfo
+coverage
+.nyc_output

@@ -1,0 +1,1 @@
+ALTER TABLE `capsules` ADD CONSTRAINT `share_token_idx` UNIQUE(`share_token`);

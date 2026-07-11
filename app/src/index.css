@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+    --card: 240 20% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 20% 5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 186 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 270 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 10% 10%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 327 100% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 186 100% 50%;
+    --radius: 0.75rem;
+  }
+
+  body {
+    @apply bg-[#050505] text-white;
+    font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
+    overflow-x: hidden;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+/* Matrix Grid Background */
+.matrix-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.07) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: pulse-opacity 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Particle Layer */
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.core-node {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: neural-float var(--duration) var(--delay) ease-in-out infinite;
+}
+
+.core-node.cyan {
+  background: rgba(0, 240, 255, 0.8);
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+}
+
+.core-node.magenta {
+  background: rgba(255, 27, 141, 0.8);
+  box-shadow: 0 0 10px #ff1b8d, 0 0 20px #ff1b8d;
+}
+
+@keyframes neural-float {
+  0% {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(calc(var(--x) + 100px), calc(var(--y) - 100px)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--x) + 100px), calc(var(--y) - 100px)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Psychedelic Data Helix */
+.spiral-container {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  perspective: 900px;
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+
+.spiral-column {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 200px;
+  height: 100%;
+}
+
+.column-left {
+  left: -5vw;
+  transform: translateY(-50%) rotateY(45deg);
+}
+
+.column-right {
+  right: -5vw;
+  transform: translateY(-50%) rotateY(-45deg);
+}
+
+.spiral-block {
+  position: absolute;
+  width: 100%;
+  height: calc(100% / 24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spiral-text {
+  font-family: 'Space Mono', monospace;
+  font-weight: 800;
+  font-size: 2.5vw;
+  color: rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  text-shadow: 0 0 22px rgba(200, 200, 255, 0.3);
+  user-select: none;
+}
+
+.column-left .spiral-block {
+  animation: spiral-scroll 12s linear infinite;
+}
+
+.column-right .spiral-block {
+  animation: spiral-scroll 12s linear infinite reverse;
+}
+
+@keyframes spiral-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+
+/* Glitch Sweep Effect */
+.glitch-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.glitch-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 240, 255, 0.15),
+    rgba(82, 0, 255, 0.15),
+    transparent
+  );
+  transition: none;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.glitch-card:hover::before {
+  animation: glitch-sweep 0.6s ease-out;
+}
+
+@keyframes glitch-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Neon Button */
+.neon-btn {
+  background: linear-gradient(135deg, #00f0ff, #5200ff, #ff1b8d);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4), 0 0 30px rgba(82, 0, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.neon-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6), 0 0 50px rgba(82, 0, 255, 0.3);
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Input glow on focus */
+.cyber-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, #00f0ff, #5200ff, #ff1b8d) 1;
+  box-shadow: 0 2px 15px rgba(0, 240, 255, 0.3);
+}
+
+/* Glass morphism card */
+.glass-panel {
+  background: rgba(10, 10, 15, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+}
+
+/* Responsive helix */
+@media (max-width: 768px) {
+  .spiral-text {
+    font-size: 4vw;
+  }
+  .spiral-block {
+    height: calc(100% / 16);
+  }
+}
+
+@media (max-width: 480px) {
+  .spiral-container {
+    display: none;
+  }
+}
