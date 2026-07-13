@@ -148,11 +148,13 @@ export const collections = mysqlTable(
       .$type<"private" | "unlisted" | "public">()
       .notNull()
       .default("private"),
+    shareToken: varchar("share_token", { length: 64 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
     userIdIdx: index("collections_user_idx").on(table.userId),
+    shareTokenUniq: uniqueIndex("collections_share_token_idx").on(table.shareToken),
   })
 );
 

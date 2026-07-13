@@ -8,6 +8,7 @@ import CollectionDetail from '@/pages/CollectionDetail';
 import Discover from '@/pages/Discover';
 import UserProfile from '@/pages/UserProfile';
 import SharedCapsule from '@/pages/SharedCapsule';
+import SharedCollection from '@/pages/SharedCollection';
 import Feed from '@/pages/Feed';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
       <Route path="/discover" element={<Discover />} />
       <Route path="/u/:userId" element={<UserProfile />} />
       <Route path="/shared/:token" element={<SharedCapsule />} />
+      <Route path="/shared/collection/:token" element={<SharedCollection />} />
       {/* 需要登录 */}
       <Route
         path="/feed"

@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Lock, Link2, Globe, Copy, Share2 } from "lucide-react";
 import { trpc } from "@/providers/trpc";
 import NeuralMatrixGrid from "@/components/NeuralMatrixGrid";
 import HolographicParticles from "@/components/HolographicParticles";
@@ -25,6 +25,13 @@ import SortableCollectionItem from "@/components/SortableCollectionItem";
 import AddCapsuleToCollectionDialog from "@/components/AddCapsuleToCollectionDialog";
 import CollectionDialog from "@/components/CollectionDialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import type { CollectionItem } from "@/types";
 
 export default function CollectionDetail() {
@@ -87,6 +94,46 @@ export default function CollectionDetail() {
     onError: (error) =>
       toast.error("删除失败 / Delete failed", { description: error.message }),
   });
+
+  const setVisibilityMutation = trpc.collection.setVisibility.useMutation({
+    onSuccess: (data) => {
+      utils.collection.get.invalidate({ id: collectionId });
+      utils.collection.list.invalidate();
+      if (data.visibility === 'unlisted' && data.shareToken) {
+        const shareUrl = `${window.location.origin}/shared/collection/${data.shareToken}`;
+        toast.success('已生成分享链接 / Share link generated', {
+          description: '点击复制按钮可复制链接',
+          action: {
+            label: '复制链接',
+            onClick: () => {
+              navigator.clipboard.writeText(shareUrl).then(() => {
+                toast.success('已复制到剪贴板 / Copied');
+              });
+            },
+          },
+        });
+      } else {
+        const labels = { private: '私有', unlisted: '隐藏', public: '公开' };
+        toast.success(`已切换为${labels[data.visibility]} / Visibility updated`);
+      }
+    },
+    onError: (error) =>
+      toast.error('切换失败 / Update failed', { description: error.message }),
+  });
+
+  const handleVisibilityChange = (v: 'private' | 'unlisted' | 'public') => {
+    if (!collection || v === collection.visibility) return;
+    setVisibilityMutation.mutate({ id: collectionId, visibility: v });
+  };
+
+  const handleCopyShareLink = () => {
+    if (!collection?.shareToken) return;
+    const shareUrl = `${window.location.origin}/shared/collection/${collection.shareToken}`;
+    navigator.clipboard
+      .writeText(shareUrl)
+      .then(() => toast.success('已复制到剪贴板 / Copied'))
+      .catch(() => toast.error('复制失败 / Copy failed'));
+  };
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -235,7 +282,56 @@ export default function CollectionDetail() {
                 {localItems.length} capsules
               </p>
             </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`rounded-md p-2 transition-all hover:bg-white/10 ${collection.visibility === 'unlisted' ? 'text-[#00ff88]' : collection.visibility === 'public' ? 'text-[#00f0ff]' : 'text-white/40'}`}
+                    title="切换可见性 / 分享"
+                    disabled={setVisibilityMutation.isPending}
+                  >
+                    <Share2 size={14} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="border-white/10 bg-[#0a0a0a]/95 text-white backdrop-blur"
+                >
+                  <DropdownMenuItem
+                    onClick={() => handleVisibilityChange('private')}
+                    className={`cursor-pointer ${collection.visibility === 'private' ? 'text-[#00f0ff] focus:text-[#00f0ff]' : ''}`}
+                  >
+                    <Lock className="size-4" />
+                    私有 / Private
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleVisibilityChange('unlisted')}
+                    className={`cursor-pointer ${collection.visibility === 'unlisted' ? 'text-[#00f0ff] focus:text-[#00f0ff]' : ''}`}
+                  >
+                    <Link2 className="size-4" />
+                    隐藏 / Unlisted
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleVisibilityChange('public')}
+                    className={`cursor-pointer ${collection.visibility === 'public' ? 'text-[#00f0ff] focus:text-[#00f0ff]' : ''}`}
+                  >
+                    <Globe className="size-4" />
+                    公开 / Public
+                  </DropdownMenuItem>
+                  {collection.visibility === 'unlisted' && collection.shareToken && (
+                    <>
+                      <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuItem
+                        onClick={handleCopyShareLink}
+                        className="cursor-pointer text-[#00ff88] focus:text-[#00ff88]"
+                      >
+                        <Copy className="size-4" />
+                        复制分享链接
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <button
                 onClick={() => setEditDialogOpen(true)}
                 className="rounded-md p-2 text-white/40 transition-all hover:bg-[#00f0ff]/10 hover:text-[#00f0ff]"

@@ -1,7 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { createRouter, protectedProcedure } from "../middleware";
+import { createRouter, protectedProcedure, publicQuery } from "../middleware";
 import { getDb } from "../queries/connection";
-import { collections, collectionItems, capsules, tags, capsuleTags } from "@db/schema";
+import { collections, collectionItems, capsules, tags, capsuleTags, user } from "@db/schema";
 import { eq, and, inArray, desc, asc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -303,5 +304,79 @@ export const collectionRouter = createRouter({
         }
       });
       return { success: true };
+    }),
+
+  setVisibility: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        visibility: z.enum(["private", "unlisted", "public"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      let shareToken: string | null = null;
+      if (input.visibility === "unlisted") {
+        const [row] = await db
+          .select({ shareToken: collections.shareToken })
+          .from(collections)
+          .where(and(eq(collections.id, input.id), eq(collections.userId, ctx.user.id)));
+        if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "胶囊集不存在" });
+        shareToken = row.shareToken ?? randomUUID();
+      }
+      const [result] = await db
+        .update(collections)
+        .set({ visibility: input.visibility, shareToken })
+        .where(and(eq(collections.id, input.id), eq(collections.userId, ctx.user.id)));
+      if (result.affectedRows === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "胶囊集不存在" });
+      }
+      return { visibility: input.visibility, shareToken };
+    }),
+
+  getSharedByToken: publicQuery
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const db = getDb();
+      const [coll] = await db
+        .select({
+          id: collections.id,
+          name: collections.name,
+          description: collections.description,
+          coverColor: collections.coverColor,
+          createdAt: collections.createdAt,
+          userId: collections.userId,
+          userName: user.name,
+          userImage: user.image,
+        })
+        .from(collections)
+        .innerJoin(user, eq(collections.userId, user.id))
+        .where(
+          and(
+            eq(collections.shareToken, input.token),
+            eq(collections.visibility, "unlisted")
+          )
+        );
+      if (!coll)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "分享链接无效或已失效 / Share link invalid or expired",
+        });
+
+      const itemRows = await db
+        .select({
+          id: capsules.id,
+          title: capsules.title,
+          url: capsules.url,
+          description: capsules.description,
+          color: capsules.color,
+          createdAt: capsules.createdAt,
+        })
+        .from(collectionItems)
+        .innerJoin(capsules, eq(collectionItems.capsuleId, capsules.id))
+        .where(eq(collectionItems.collectionId, coll.id))
+        .orderBy(asc(collectionItems.sortOrder));
+
+      return { ...coll, capsules: itemRows };
     }),
 });

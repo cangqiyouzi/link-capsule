@@ -50,6 +50,13 @@
       "when": 1783599552456,
       "tag": "0006_flimsy_spitfire",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1783984585160,
+      "tag": "0007_fantastic_the_hood",
+      "breakpoints": true
     }
   ]
 }
