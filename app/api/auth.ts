@@ -17,6 +17,9 @@ export const auth = betterAuth({
   }),
   baseURL: env.betterAuthUrl,
   secret: env.betterAuthSecret,
+  advanced: {
+    useSecureCookies: env.betterAuthUrl.startsWith("https://"),
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
