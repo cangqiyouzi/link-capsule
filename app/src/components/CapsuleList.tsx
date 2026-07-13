@@ -85,7 +85,7 @@ export default function CapsuleList({ capsules, onDelete, onPin, newestId, isDel
 
         {/* Search input */}
         {searchable && (
-        <div className="relative flex-1 sm:max-w-[280px]">
+        <div className="relative w-full sm:max-w-[280px]">
           <Search
             size={12}
             className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-white/20"

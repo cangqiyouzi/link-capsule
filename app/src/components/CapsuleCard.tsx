@@ -161,110 +161,8 @@ export default function CapsuleCard({ capsule, onDelete, onPin, isNew }: Capsule
 
   const VisibilityIcon = VISIBILITY_ICON[capsule.visibility];
 
-  return (
-    <div
-      ref={cardRef}
-      className={`glitch-card glass-panel group relative flex items-center gap-4 rounded-lg px-5 py-4 transition-all duration-300 hover:bg-white/5 ${
-        capsule.pinned
-          ? 'border-[#ffaa00]/30 shadow-[0_0_15px_rgba(255,170,0,0.08)]'
-          : ''
-      } ${capsule.health?.status === 'dead' ? 'opacity-50' : ''}`}
-    >
-      {/* Color indicator */}
-      <div
-        className="h-2.5 w-2.5 shrink-0 rounded-full shadow-lg"
-        style={{
-          backgroundColor: capsule.color,
-          boxShadow: `0 0 8px ${capsule.color}, 0 0 16px ${capsule.color}40`,
-        }}
-      />
-
-      {/* Content */}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <h3
-            className={`truncate text-sm font-medium text-white md:text-base ${
-              capsule.health?.status === 'dead' ? 'line-through' : ''
-            }`}
-            style={{ fontFamily: "'Noto Sans SC', sans-serif" }}
-          >
-            {capsule.title}
-          </h3>
-          {capsule.pinned && (
-            <span
-              className="shrink-0 rounded border border-[#ffaa00]/30 bg-[#ffaa00]/10 px-1.5 py-0.5 text-[9px] tracking-wider text-[#ffaa00]"
-              style={{ fontFamily: "'Space Mono', monospace" }}
-            >
-              PINNED
-            </span>
-          )}
-          {/* 可见性图标 badge */}
-          <span
-            className={`shrink-0 ${VISIBILITY_COLOR[capsule.visibility]}`}
-            title={`可见性: ${VISIBILITY_LABEL[capsule.visibility]}`}
-          >
-            <VisibilityIcon size={12} />
-          </span>
-          {/* 链接健康 badge */}
-          {checking ? (
-            <span
-              className="shrink-0 text-[#00f0ff]"
-              title="检测中…"
-            >
-              <Loader2 size={12} className="animate-spin" />
-            </span>
-          ) : capsule.health && HEALTH_BADGE[capsule.health.status] ? (
-            (() => {
-              const badge = HEALTH_BADGE[capsule.health.status]!;
-              const Icon = badge.icon;
-              const titleParts = [badge.label];
-              if (capsule.health.httpCode) titleParts.push(`HTTP ${capsule.health.httpCode}`);
-              if (capsule.health.lastCheckedAt) titleParts.push(formatTime(capsule.health.lastCheckedAt));
-              if (capsule.health.lastError) titleParts.push(capsule.health.lastError);
-              return (
-                <span
-                  className={`shrink-0 ${badge.color}`}
-                  title={titleParts.join(' · ')}
-                >
-                  <Icon size={12} />
-                </span>
-              );
-            })()
-          ) : null}
-        </div>
-        <a
-          href={capsule.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-0.5 flex items-center gap-1 truncate text-xs text-white/30 transition-colors hover:text-[#00f0ff]"
-          style={{ fontFamily: "'Space Mono', monospace" }}
-        >
-          <ExternalLink size={10} />
-          <span className="truncate">{capsule.url}</span>
-        </a>
-        {capsule.tags && capsule.tags.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {capsule.tags.map((t) => (
-              <Badge
-                key={t.id}
-                variant="secondary"
-                className="bg-white/5 px-1.5 py-0 text-[10px] font-normal text-white/40"
-              >
-                {t.name}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Timestamp */}
-      <span
-        className="hidden shrink-0 text-xs text-white/20 md:block md:text-sm"
-        style={{ fontFamily: "'Space Mono', monospace" }}
-      >
-        {formatTime(capsule.createdAt)}
-      </span>
-
+  const actionButtons = (
+    <>
       {/* 可见性切换菜单 */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -357,6 +255,119 @@ export default function CapsuleCard({ capsule, onDelete, onPin, isNew }: Capsule
       >
         <Trash2 size={14} />
       </button>
+    </>
+  );
+
+  return (
+    <div
+      ref={cardRef}
+      className={`glitch-card glass-panel group relative flex flex-col gap-3 rounded-lg px-4 py-4 transition-all duration-300 hover:bg-white/5 sm:flex-row sm:items-center sm:gap-4 sm:px-5 ${
+        capsule.pinned
+          ? 'border-[#ffaa00]/30 shadow-[0_0_15px_rgba(255,170,0,0.08)]'
+          : ''
+      } ${capsule.health?.status === 'dead' ? 'opacity-50' : ''}`}
+    >
+      {/* Main row: indicator + content + desktop actions */}
+      <div className="flex items-center gap-3 sm:min-w-0 sm:flex-1 sm:gap-4">
+        {/* Color indicator */}
+        <div
+          className="h-2.5 w-2.5 shrink-0 rounded-full shadow-lg"
+          style={{
+            backgroundColor: capsule.color,
+            boxShadow: `0 0 8px ${capsule.color}, 0 0 16px ${capsule.color}40`,
+          }}
+        />
+
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h3
+              className={`truncate text-sm font-medium text-white sm:text-base ${
+                capsule.health?.status === 'dead' ? 'line-through' : ''
+              }`}
+              style={{ fontFamily: "'Noto Sans SC', sans-serif" }}
+            >
+              {capsule.title}
+            </h3>
+            {capsule.pinned && (
+              <span
+                className="shrink-0 rounded border border-[#ffaa00]/30 bg-[#ffaa00]/10 px-1.5 py-0.5 text-[9px] tracking-wider text-[#ffaa00]"
+                style={{ fontFamily: "'Space Mono', monospace" }}
+              >
+                PINNED
+              </span>
+            )}
+            {/* 可见性图标 badge */}
+            <span
+              className={`shrink-0 ${VISIBILITY_COLOR[capsule.visibility]}`}
+              title={`可见性: ${VISIBILITY_LABEL[capsule.visibility]}`}
+            >
+              <VisibilityIcon size={12} />
+            </span>
+            {/* 链接健康 badge */}
+            {checking ? (
+              <span className="shrink-0 text-[#00f0ff]" title="检测中…">
+                <Loader2 size={12} className="animate-spin" />
+              </span>
+            ) : capsule.health && HEALTH_BADGE[capsule.health.status] ? (
+              (() => {
+                const badge = HEALTH_BADGE[capsule.health.status]!;
+                const Icon = badge.icon;
+                const titleParts = [badge.label];
+                if (capsule.health.httpCode) titleParts.push(`HTTP ${capsule.health.httpCode}`);
+                if (capsule.health.lastCheckedAt) titleParts.push(formatTime(capsule.health.lastCheckedAt));
+                if (capsule.health.lastError) titleParts.push(capsule.health.lastError);
+                return (
+                  <span className={`shrink-0 ${badge.color}`} title={titleParts.join(' · ')}>
+                    <Icon size={12} />
+                  </span>
+                );
+              })()
+            ) : null}
+          </div>
+          <a
+            href={capsule.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-0.5 flex items-center gap-1 truncate text-xs text-white/30 transition-colors hover:text-[#00f0ff]"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            <ExternalLink size={10} />
+            <span className="truncate">{capsule.url}</span>
+          </a>
+          {capsule.tags && capsule.tags.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {capsule.tags.map((t) => (
+                <Badge
+                  key={t.id}
+                  variant="secondary"
+                  className="bg-white/5 px-1.5 py-0 text-[10px] font-normal text-white/40"
+                >
+                  {t.name}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Timestamp - desktop only */}
+        <span
+          className="hidden shrink-0 text-xs text-white/20 md:block md:text-sm"
+          style={{ fontFamily: "'Space Mono', monospace" }}
+        >
+          {formatTime(capsule.createdAt)}
+        </span>
+
+        {/* Desktop actions */}
+        <div className="hidden items-center gap-1 sm:flex">
+          {actionButtons}
+        </div>
+      </div>
+
+      {/* Mobile actions */}
+      <div className="flex items-center justify-end gap-2 border-t border-white/5 pt-2 sm:hidden">
+        {actionButtons}
+      </div>
 
       <CapsuleEditDialog key={capsule.id} capsule={capsule} open={editOpen} onOpenChange={setEditOpen} />
     </div>

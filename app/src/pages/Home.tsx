@@ -147,19 +147,21 @@ export default function Home() {
         {/* Input Console */}
         <div className="mb-4 flex w-full justify-center px-4">
           <div className="w-full max-w-[640px]">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <Sidebar
-                selectedTagId={selectedTagId}
-                selectedCollectionId={selectedCollectionId}
-                pinnedOnly={pinnedOnly}
-                onTagSelect={setSelectedTagId}
-                onCollectionSelect={setSelectedCollectionId}
-                onPinnedToggle={setPinnedOnly}
-              />
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
+                <Sidebar
+                  selectedTagId={selectedTagId}
+                  selectedCollectionId={selectedCollectionId}
+                  pinnedOnly={pinnedOnly}
+                  onTagSelect={setSelectedTagId}
+                  onCollectionSelect={setSelectedCollectionId}
+                  onPinnedToggle={setPinnedOnly}
+                />
+              </div>
+              <div className="flex items-center justify-end gap-2">
                 <button
                   onClick={() => setHealthStatus((prev) => (prev === 'dead' ? 'all' : 'dead'))}
-                  className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs transition-all ${
+                  className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs transition-all ${
                     healthStatus === 'dead'
                       ? 'border-red-500/40 bg-red-500/15 text-red-400'
                       : 'border-red-500/20 bg-red-500/5 text-red-400/70 hover:border-red-500/40 hover:bg-red-500/10'
@@ -170,7 +172,9 @@ export default function Home() {
                   <XCircle size={14} />
                   <span>失效 {deadCount}</span>
                 </button>
-                <HealthFilter value={healthStatus} onChange={setHealthStatus} />
+                <div className="flex-1 sm:flex-initial">
+                  <HealthFilter value={healthStatus} onChange={setHealthStatus} />
+                </div>
               </div>
             </div>
             <InputConsole key={inputKey} onAdd={handleAdd} isSubmitting={createMutation.isPending} />
